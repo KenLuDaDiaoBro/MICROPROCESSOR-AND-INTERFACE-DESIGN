@@ -1,0 +1,32 @@
+A51 MACRO ASSEMBLER  BASIC1                                                               10/19/2024 21:31:29 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Basic1.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Basic1.A51 SET(SMALL) DEBUG PRINT(.\Listings\Basic1.lst) OBJECT(.\Objec
+                      ts\Basic1.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0; code start from 0000H
+0000 7432              2     MOV A, #32H; move 32H into ACC
+0002 75F006            3     MOV B, #06H; move 06H into B
+0005 95F0              4     SUBB A, B; A-B, then save into ACC
+0007 75F007            5     MOV B, #07H; move multiplier 07H into B
+000A A4                6     MUL AB; AxB
+                       7     END
+A51 MACRO ASSEMBLER  BASIC1                                                               10/19/2024 21:31:29 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+B. . . . . . . . .  D ADDR   00F0H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

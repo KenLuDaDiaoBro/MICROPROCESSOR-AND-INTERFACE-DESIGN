@@ -1,0 +1,28 @@
+A51 MACRO ASSEMBLER  BASIC                                                                09/23/2024 12:03:57 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Basic.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Basic.A51 SET(SMALL) DEBUG PRINT(.\Listings\Basic.lst) OBJECT(.\Objects
+                      \Basic.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0
+0000 7830              2     MOV R0, #30H
+0002 E8                3     MOV A, R0
+                       4     END
+A51 MACRO ASSEMBLER  BASIC                                                                09/23/2024 12:03:57 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

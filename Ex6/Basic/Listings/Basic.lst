@@ -1,0 +1,73 @@
+A51 MACRO ASSEMBLER  BASIC                                                                11/02/2024 21:22:45 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Basic.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Basic.A51 SET(SMALL) DEBUG PRINT(.\Listings\Basic.lst) OBJECT(.\Objects
+                      \Basic.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1                             ORG 00H ;code start from 00H
+0000 802E              2                             SJMP MAIN ;jump to MAIN
+0003                   3                             ORG 03H ;vector address for INT0
+0003 803E              4                             SJMP INT0_ISR ;jump to INT0_ISR
+0030                   5                             ORG 030H ;after vector table space
+0030 75A881            6     MAIN:           MOV IE,#10000001B ;enable EA and EX0
+0033 758130            7                             MOV SP,#30H ;stack start from #30H
+0036 D288              8                             SETB IT0 ;falling edge-triggered
+0038 7400              9                             MOV A, #00000000B ;set ACC as0000000B
+003A F5A0             10     LOOP:           MOV P2,A ;P1 = A (LED output)
+003C 115F             11                             CALL DELAY ;call delay function
+003E F4               12                             CPL A ;reverse A
+003F D2A8             13                             SETB EX0
+0041 80F7             14                             SJMP LOOP ;infinite loop
+0043 C2A8             15     INT0_ISR:       CLR EX0
+0045 C0D0             16                             PUSH PSW ;push PSW into stack
+0047 C0E0             17                             PUSH ACC ;push ACC into stack
+0049 D2D3             18                             SETB RS0 ;switch to RB1
+004B 74FE             19                             MOV A, #11111110B ;set ACC as 11111110B
+004D 7818             20                             MOV R0,#24 ;loop counter = 24
+004F F5A0             21     ROTATE_L:       MOV P2,A ;P2 = A (LED output)
+0051 115F             22                             CALL DELAY ;call delay function
+0053 23               23                             RL A ;rotate left
+0054 D8F9             24                             DJNZ R0,ROTATE_L ;loop until R0 is 0
+0056 115F             25                             CALL DELAY
+0058 C2D3             26                             CLR RS0
+005A D0E0             27                             POP ACC ;pop out ACC fromstack
+005C D0D0             28                             POP PSW ;pop out PSW fromstack
+005E 32               29                             RETI ;return from ISR
+005F 7FC8             30     DELAY:          MOV R7,#200
+0061 7EFA             31     D1:             MOV R6,#250
+0063 DEFE             32                             DJNZ R6, $
+0065 DFFA             33                             DJNZ R7,D1
+0067 22               34                             RET ;return
+                      35                             END ;end the code
+A51 MACRO ASSEMBLER  BASIC                                                                11/02/2024 21:22:45 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+D1 . . . . . . . .  C ADDR   0061H   A   
+DELAY. . . . . . .  C ADDR   005FH   A   
+EX0. . . . . . . .  B ADDR   00A8H.0 A   
+IE . . . . . . . .  D ADDR   00A8H   A   
+INT0_ISR . . . . .  C ADDR   0043H   A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+LOOP . . . . . . .  C ADDR   003AH   A   
+MAIN . . . . . . .  C ADDR   0030H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+ROTATE_L . . . . .  C ADDR   004FH   A   
+RS0. . . . . . . .  B ADDR   00D0H.3 A   
+SP . . . . . . . .  D ADDR   0081H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

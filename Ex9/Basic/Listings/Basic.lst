@@ -1,0 +1,45 @@
+C51 COMPILER V9.60.7.0   BASIC                                                             11/30/2024 23:01:49 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE BASIC
+OBJECT MODULE PLACED IN .\Objects\Basic.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Basic.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\Bas
+                    -ic.lst) TABS(2) OBJECT(.\Objects\Basic.obj)
+
+line level    source
+
+   1          #include <regx51.h>
+   2          
+   3          void main( )
+   4          {
+   5   1        IT0 = 0; //enable a low-level signal on externalinterrupt
+   6   1        EX0 = 1; //enable INT0
+   7   1        EA = 1; //enable interrupt
+   8   1        P3_4 = 0; //WR=0,clean the data
+   9   1        P3_4 = 1; //WR=1,analog convert to digital
+  10   1        while(1); //infinite loop
+  11   1      }
+  12          
+  13          void int_0(void)interrupt 0 //INT0 interrupt function
+  14          {
+  15   1        P3_5 = 0; //RD=0,readthe digital data
+  16   1        if (P1 >256 / 2) P2 = 0; //LED on
+  17   1        else P2 = 255; //LED off
+  18   1        P3_5 = 1; //RD=1
+  19   1        P3_4 = 0; //WR=0,clean the data
+  20   1        P3_4 = 1; //WR=1,analog convert to digital
+  21   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     44    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

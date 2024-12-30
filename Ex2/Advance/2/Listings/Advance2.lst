@@ -1,0 +1,66 @@
+A51 MACRO ASSEMBLER  ADVANCE2                                                             10/07/2024 20:00:40 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Advance2.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Advance2.A51 SET(SMALL) DEBUG PRINT(.\Listings\Advance2.lst) OBJECT(.\O
+                      bjects\Advance2.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1                     ORG 00H ; start address is 0
+0000 90002C            2                     MOV DPTR, #TABLE ; DPTR point to TABLE
+0003 7804              3     START:  MOV R0, #4 ; 4 LED
+0005 7900              4                     MOV R1, #0 ; table index
+0007 7AFE              5                     MOV R2, #0FEH ; LED drive pin
+0009 8AA0              6     LOOP:   MOV P2, R2 ; select LED
+000B E9                7                     MOV A, R1 ; move R1 to A
+000C 93                8                     MOVC A, @A+DPTR ; get value from table
+000D F590              9                     MOV P1, A ; move value to P1
+000F 1119             10                     CALL DELAY ; delay 0.5 ms
+0011 09               11                     INC R1 ; increase R1
+0012 EA               12                     MOV A, R2 ; move R2 to A
+0013 23               13                     RL A ; rotate A
+0014 FA               14                     MOV R2, A ; move A back to R2
+0015 D8F2             15                     DJNZ R0, LOOP ; decrement R0 until 0
+0017 80EA             16                     SJMP START ; jump to start
+                      17                     
+0019 7BFA             18     DELAY:  MOV R3, #250 ; loop 250 times
+001B 7CFA             19                     MOV R4, #250
+001D 7D04             20                     MOV R5, #4
+001F DDFE             21     DELAY1: DJNZ R5, DELAY1
+0021 7D04             22     DELAY2: MOV R5, #4
+0023 DCFA             23                     DJNZ R4, DELAY1 
+0025 7D04             24     DELAY3: MOV R5, #4
+0027 7CFA             25                     MOV R4, #250
+0029 DBF4             26                     DJNZ R3, DELAY1 ; decrement R3 until 0
+002B 22               27                     RET ; return from subroutine
+                      28                     
+002C 82               29     TABLE:  DB 082H ; 6
+002D C0               30                     DB 0C0H ; 0
+002E 82               31                     DB 082H ; 6
+002F F8               32                     DB 0F8H ; 7
+                      33                     END ; end of program
+A51 MACRO ASSEMBLER  ADVANCE2                                                             10/07/2024 20:00:40 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+DELAY. . . . . . .  C ADDR   0019H   A   
+DELAY1 . . . . . .  C ADDR   001FH   A   
+DELAY2 . . . . . .  C ADDR   0021H   A   
+DELAY3 . . . . . .  C ADDR   0025H   A   
+LOOP . . . . . . .  C ADDR   0009H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+START. . . . . . .  C ADDR   0003H   A   
+TABLE. . . . . . .  C ADDR   002CH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

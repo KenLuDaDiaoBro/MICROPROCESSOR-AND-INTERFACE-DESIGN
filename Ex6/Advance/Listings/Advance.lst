@@ -1,0 +1,99 @@
+A51 MACRO ASSEMBLER  ADVANCE                                                              11/11/2024 17:56:12 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Advance.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Advance.A51 SET(SMALL) DEBUG PRINT(.\Listings\Advance.lst) OBJECT(.\Obj
+                      ects\Advance.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1                             ORG 00H ;code start from 00H
+0000 802E              2                             SJMP MAIN ;jump to MAIN
+0003                   3                             ORG 03H ;vector address for INT0
+0003 8045              4                             SJMP INT0_ISR ;jump to INT0_ISR
+0013                   5                             ORG 13H ;vector address for INT1
+0013 8047              6                             SJMP INT1_ISR ;jump to INT1_ISR
+0030                   7                             ORG 030H ;after vector table space
+0030 75A885            8     MAIN:           MOV IE,#10000101B ;enable EA, EX0 and EX1
+0033 75B804            9                             MOV IP,#00000100B ;enable EA, EX0 and EX1
+0036 758130           10                             MOV SP,#30H ;stack start from #30H
+0039 C288             11                             CLR IT0 ;lower trigger
+003B C28A             12                             CLR IT1
+003D 7400             13                             MOV A, #00000000B ;set ACC as0000000B
+003F F580             14     LOOP:           MOV P0,A ;P1 = A (LED output)
+0041 117E             15                             CALL DELAY ;call delay function
+0043 F4               16                             CPL A ;reverse A
+0044 D2A8             17                             SETB EX0
+0046 D2AA             18                             SETB EX1
+0048 80F5             19                             SJMP LOOP ;infinite loop
+                      20                             
+004A C2A8             21     INT0_ISR:       CLR EX0
+004C 117E             22                             CALL DELAY
+004E C0D0             23                             PUSH PSW ;push PSW into stack
+0050 C0E0             24                             PUSH ACC ;push ACC into stack
+0052 D2D3             25                             SETB RS0 ;switch to RB1
+0054 C2D4             26                             CLR RS1
+0056 74F0             27                             MOV A, #11110000B ;set ACC as 11111110B
+0058 7818             28                             MOV R0,#24 ;loop counter = 24
+005A 8012             29                             SJMP ROTATE
+                      30     
+005C C2A8             31     INT1_ISR:       CLR EX0
+005E C2AA             32                             CLR EX1
+0060 117E             33                             CALL DELAY
+0062 C0D0             34                             PUSH PSW ;push PSW into stack
+0064 C0E0             35                             PUSH ACC ;push ACC into stack
+0066 C2D3             36                             CLR RS0
+0068 D2D4             37                             SETB RS1 ;switch to RB1
+006A 74FE             38                             MOV A, #11111110B ;set ACC as 11111110B
+006C 7810             39                             MOV R0,#16 ;loop counter = 16
+                      40                             
+006E F580             41     ROTATE:         MOV P0,A ;P2 = A (LED output)
+0070 117E             42                             CALL DELAY ;call delay function
+0072 23               43                             RL A ;rotate left
+0073 D8F9             44                             DJNZ R0,ROTATE ;loop until R0 is 0
+0075 C2D3             45                             CLR RS0
+0077 C2D4             46                             CLR RS1
+0079 D0E0             47                             POP ACC ;pop out ACC fromstack
+007B D0D0             48                             POP PSW ;pop out PSW fromstack
+007D 32               49                             RETI ;return from ISR
+                      50                             
+007E 7FC8             51     DELAY:          MOV R7,#200
+0080 7EFA             52     D1:             MOV R6,#250
+0082 DEFE             53                             DJNZ R6, $
+0084 DFFA             54                             DJNZ R7,D1
+0086 22               55                             RET ;return
+                      56                             END ;end the code
+A51 MACRO ASSEMBLER  ADVANCE                                                              11/11/2024 17:56:12 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+D1 . . . . . . . .  C ADDR   0080H   A   
+DELAY. . . . . . .  C ADDR   007EH   A   
+EX0. . . . . . . .  B ADDR   00A8H.0 A   
+EX1. . . . . . . .  B ADDR   00A8H.2 A   
+IE . . . . . . . .  D ADDR   00A8H   A   
+INT0_ISR . . . . .  C ADDR   004AH   A   
+INT1_ISR . . . . .  C ADDR   005CH   A   
+IP . . . . . . . .  D ADDR   00B8H   A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+IT1. . . . . . . .  B ADDR   0088H.2 A   
+LOOP . . . . . . .  C ADDR   003FH   A   
+MAIN . . . . . . .  C ADDR   0030H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+ROTATE . . . . . .  C ADDR   006EH   A   
+RS0. . . . . . . .  B ADDR   00D0H.3 A   
+RS1. . . . . . . .  B ADDR   00D0H.4 A   
+SP . . . . . . . .  D ADDR   0081H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

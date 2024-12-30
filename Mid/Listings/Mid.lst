@@ -1,0 +1,242 @@
+A51 MACRO ASSEMBLER  MID                                                                  11/12/2024 17:58:54 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Mid.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Mid.A51 SET(SMALL) DEBUG PRINT(.\Listings\Mid.lst) OBJECT(.\Objects\Mid
+                      .obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1                             ORG 00H ;code start from 00H
+0000 802E              2                             SJMP MAIN ;jump to MAIN
+0003                   3                             ORG 03H ;vector address for INT0
+0003 0200E6            4                             LJMP INT0_ISR ;jump to INT0_ISR
+0013                   5                             ORG 13H ;vector address for INT1
+0013 020105            6                             LJMP INT1_ISR ;jump to INT1_ISR
+0030                   7                             ORG 030H ;after vector table space
+                       8                                     
+0030 75A885            9     MAIN:           MOV IE,#10000101B ;enable EA, EX0 and EX1
+0033 75B804           10                             MOV IP,#00000100B ;enable EA, EX0 and EX1
+0036 758130           11                             MOV SP,#30H ;stack start from #30H
+0039 C288             12                             CLR IT0 ;lower trigger
+003B C28A             13                             CLR IT1
+003D 90013F           14                             MOV DPTR, #TABLE ; DPTR point to TABLE
+0040 7A00             15                             MOV R2, #00000000B
+0042 EA               16                             MOV A, R2
+0043 F580             17                             MOV P0, A
+0045 7AAA             18                             MOV R2, #10101010B
+0047 EA               19                             MOV A, R2
+0048 F590             20                             MOV P1, A
+004A 7E00             21                             MOV R6, #0
+                      22                             
+004C 7AF7             23     START:          MOV R2, #11110111B ; set first row
+004E EA               24                             MOV A, R2 ; move R2 to A
+004F F5A0             25                             MOV P2, A ; input scanned signal
+0051 30A453           26                             JNB P2.4, ADD_LABLE ; scan column 4
+0054 03               27                             RR A ; nextrow
+0055 F5A0             28                             MOV P2, A ; input scanned signal
+0057 30A455           29                             JNB P2.4, SUB_LABLE ; scan column 4
+005A 03               30                             RR A ; nextrow
+005B F5A0             31                             MOV P2, A ; input scanned signal
+005D 30A457           32                             JNB P2.4, MUL_LABLE ; scan column 4
+0060 03               33                             RR A ; nextrow
+0061 F5A0             34                             MOV P2, A ; input scanned signal
+0063 30A45D           35                             JNB P2.4, DIV_LABLE ; scan column 4
+0066 30A56F           36                             JNB P2.5, POPU
+0069 30A663           37                             JNB P2.6, ZERO
+006C 7801             38                             MOV R0 , #1
+006E 7903             39                             MOV R1, #3 ; set 3 row
+0070 7AF7             40                             MOV R2, #11110111B ; set first row
+                      41                             
+0072 EA               42     SCANNUM:        MOV A, R2 ; move R2 to A
+0073 F5A0             43                             MOV P2, A ; input scanned signal
+0075 30A70F           44                             JNB P2.7, KEYIN1 ; scan column 1
+0078 08               45                             INC R0 ; add #01 into R0
+0079 30A60B           46                             JNB P2.6, KEYIN1 ; scan column 2
+007C 08               47                             INC R0 ; add #01 into R0
+007D 30A507           48                             JNB P2.5, KEYIN1 ; scan column 3
+0080 08               49                             INC R0 ; add #01 into R0
+0081 03               50                             RR A ; nextrow
+0082 FA               51                             MOV R2, A ; move A to R2
+0083 D9ED             52                             DJNZ R1, SCANNUM ; scan 3 rows
+0085 80C5             53                             SJMP START ; jump to scan keypad again
+                      54                             
+0087 3123             55     KEYIN1:         CALL DEBOUNCE ; call debounce function
+0089 E8               56                             MOV A, R0
+008A FF               57                             MOV R7, A
+A51 MACRO ASSEMBLER  MID                                                                  11/12/2024 17:58:54 PAGE     2
+
+008B 75F005           58                             MOV B, #5
+008E 84               59                             DIV AB
+008F 93               60                             MOVC A, @A+DPTR ; accordingA, getsignal fromTABLE
+0090 F8               61                             MOV R0, A
+0091 E5F0             62                             MOV A, B
+0093 93               63                             MOVC A, @A+DPTR ; accordingA, getsignal fromTABLE
+0094 F5F0             64                             MOV B, A
+0096 E8               65                             MOV A, R0
+0097 7804             66                             MOV R0, #4
+0099 23               67     CARRY:          RL A
+009A D8FD             68                             DJNZ R0, CARRY
+009C 25F0             69                             ADD A, B
+009E F580             70                             MOV P0, A
+00A0 F8               71                             MOV R0, A
+00A1 C000             72                             PUSH 00h
+00A3 0E               73                             INC R6
+00A4 02004C           74                             LJMP START
+                      75                             
+00A7 3123             76     ADD_LABLE:      CALL DEBOUNCE ; call debounce function
+00A9 0F               77                             INC R7
+00AA EF               78                             MOV A, R7
+00AB F8               79                             MOV R0, A
+00AC 020087           80                             LJMP KEYIN1 ; jump to scan keypad again
+                      81                             
+00AF 3123             82     SUB_LABLE:      CALL DEBOUNCE ; call debounce function
+00B1 1F               83                             DEC R7
+00B2 EF               84                             MOV A, R7
+00B3 F8               85                             MOV R0, A
+00B4 020087           86                             LJMP KEYIN1 ; jump to scan keypad again
+                      87                             
+00B7 3123             88     MUL_LABLE:      CALL DEBOUNCE ; call debounce function
+00B9 EF               89                             MOV A, R7
+00BA 75F002           90                             MOV B, #2
+00BD A4               91                             MUL AB
+00BE FF               92                             MOV R7, A
+00BF F8               93                             MOV R0, A
+00C0 020087           94                             LJMP KEYIN1 ; jump to scan keypad again
+                      95                             
+00C3 3123             96     DIV_LABLE:      CALL DEBOUNCE ; call debounce function
+00C5 EF               97                             MOV A, R7
+00C6 75F002           98                             MOV B, #2
+00C9 84               99                             DIV AB
+00CA FF              100                             MOV R7, A
+00CB F8              101                             MOV R0, A
+00CC 020087          102                             LJMP KEYIN1 ; jump to scan keypad again
+                     103                             
+00CF 7F00            104     ZERO:           MOV R7, #0
+00D1 74FF            105                             MOV A, #11111111B
+00D3 F580            106                             MOV P0, A
+00D5 02004C          107                             LJMP START
+                     108                             
+00D8 3123            109     POPU:           CALL DEBOUNCE ; call debounce function
+00DA 312C            110                             CALL DELAY
+00DC D000            111                             POP 00h
+00DE E8              112                             MOV A, R0
+00DF F580            113                             MOV P0, A
+00E1 DEF5            114                             DJNZ R6, POPU
+00E3 02004C          115                             LJMP START      
+                     116                             
+00E6 312C            117     INT0_ISR:       CALL DELAY
+00E8 C0D0            118                             PUSH PSW ;push PSW into stack
+00EA C0E0            119                             PUSH ACC ;push ACC into stack
+00EC 1F              120                             DEC R7
+00ED EF              121     CKIN:           MOV A, R7
+00EE F8              122                             MOV R0, A
+00EF 310A            123                             CALL KEYIN2
+A51 MACRO ASSEMBLER  MID                                                                  11/12/2024 17:58:54 PAGE     3
+
+00F1 312C            124                             CALL DELAY
+00F3 DFF8            125                             DJNZ R7, CKIN
+00F5 7400            126                             MOV A, #00000000B
+00F7 780F            127                             MOV R0, #15
+00F9 F580            128     LOOP:           MOV P0, A ;P1 = A (LED output)
+00FB 312C            129                             CALL DELAY ;call delay function
+00FD F4              130                             CPL A ;reverse A
+00FE D8F9            131                             DJNZ R0, LOOP ;infinite loop
+0100 D0E0            132                             POP ACC ;pop out ACC fromstack
+0102 D0D0            133                             POP PSW ;pop out PSW fromstack
+0104 32              134                             RETI
+                     135     
+0105 312C            136     INT1_ISR:       CALL DELAY
+0107 3105            137                             CALL INT1_ISR
+0109 32              138                             RETI ;return from ISR
+                     139                             
+010A 3123            140     KEYIN2:         CALL DEBOUNCE ; call debounce function
+010C E8              141                             MOV A, R0
+010D 75F005          142                             MOV B, #5
+0110 84              143                             DIV AB
+0111 93              144                             MOVC A, @A+DPTR ; accordingA, getsignal fromTABLE
+0112 F8              145                             MOV R0, A
+0113 E5F0            146                             MOV A, B
+0115 93              147                             MOVC A, @A+DPTR ; accordingA, getsignal fromTABLE
+0116 F5F0            148                             MOV B, A
+0118 E8              149                             MOV A, R0
+0119 7804            150                             MOV R0, #4
+011B 23              151     CARRY2:         RL A
+011C D8FD            152                             DJNZ R0, CARRY2
+011E 25F0            153                             ADD A, B
+0120 F580            154                             MOV P0, A
+0122 22              155                             RET
+                     156                             
+0123 7CFA            157     DEBOUNCE:       MOV R4, #250 ; move 50 times intoR4
+0125 7BFA            158     DE_500_us:      MOV R3, #250 ; move 250 times intoR3
+0127 DBFE            159                             DJNZ R3, $ ; jump to itself R3 times    
+0129 DCFA            160                             DJNZ R4, DE_500_us ; delay 25ms
+012B 22              161                             RET ; return to main code
+                     162                             
+012C 7BFA            163     DELAY:          MOV R3, #250 ; loop 250 times
+012E 7CFA            164                             MOV R4, #250
+0130 7D04            165                             MOV R5, #4
+0132 DDFE            166     DELAY1:         DJNZ R5, DELAY1
+0134 7D04            167     DELAY2:         MOV R5, #4
+0136 DCFA            168                             DJNZ R4, DELAY1 
+0138 7D04            169     DELAY3:         MOV R5, #4
+013A 7CFA            170                             MOV R4, #250
+013C DBF4            171                             DJNZ R3, DELAY1 ; decrement R3 until 0
+013E 22              172                             RET
+                     173                             
+013F 0F              174     TABLE:          DB 00001111B ; display 0
+0140 0E              175                             DB 00001110B ; display 1
+0141 0C              176                             DB 00001100B ; display 2
+0142 08              177                             DB 00001000B ; display 3
+0143 00              178                             DB 00000000B ; display 4
+                     179                             END
+A51 MACRO ASSEMBLER  MID                                                                  11/12/2024 17:58:54 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+ADD_LABLE. . . . .  C ADDR   00A7H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+CARRY. . . . . . .  C ADDR   0099H   A   
+CARRY2 . . . . . .  C ADDR   011BH   A   
+CKIN . . . . . . .  C ADDR   00EDH   A   
+DEBOUNCE . . . . .  C ADDR   0123H   A   
+DELAY. . . . . . .  C ADDR   012CH   A   
+DELAY1 . . . . . .  C ADDR   0132H   A   
+DELAY2 . . . . . .  C ADDR   0134H   A   
+DELAY3 . . . . . .  C ADDR   0138H   A   
+DE_500_US. . . . .  C ADDR   0125H   A   
+DIV_LABLE. . . . .  C ADDR   00C3H   A   
+IE . . . . . . . .  D ADDR   00A8H   A   
+INT0_ISR . . . . .  C ADDR   00E6H   A   
+INT1_ISR . . . . .  C ADDR   0105H   A   
+IP . . . . . . . .  D ADDR   00B8H   A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+IT1. . . . . . . .  B ADDR   0088H.2 A   
+KEYIN1 . . . . . .  C ADDR   0087H   A   
+KEYIN2 . . . . . .  C ADDR   010AH   A   
+LOOP . . . . . . .  C ADDR   00F9H   A   
+MAIN . . . . . . .  C ADDR   0030H   A   
+MUL_LABLE. . . . .  C ADDR   00B7H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+POPU . . . . . . .  C ADDR   00D8H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+SCANNUM. . . . . .  C ADDR   0072H   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+START. . . . . . .  C ADDR   004CH   A   
+SUB_LABLE. . . . .  C ADDR   00AFH   A   
+TABLE. . . . . . .  C ADDR   013FH   A   
+ZERO . . . . . . .  C ADDR   00CFH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

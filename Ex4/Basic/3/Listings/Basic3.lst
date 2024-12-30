@@ -1,0 +1,33 @@
+A51 MACRO ASSEMBLER  BASIC3                                                               10/19/2024 22:44:17 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Basic3.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Basic3.A51 SET(SMALL) DEBUG PRINT(.\Listings\Basic3.lst) OBJECT(.\Objec
+                      ts\Basic3.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0; code start from 0000H
+0000 74BD              2     MOV A, #10111101B; move 10111101B into ACC
+0002 54EF              3     ANL A, #11101111B; use AND Gate to turn Bit 4 into 0
+0004 F5F0              4     MOV B,A; move the value into B
+0006 7442              5     MOV A, #01000010B ; move 01000010B into ACC
+0008 4410              6     ORL A, #00010000B ; use OR Gate to turn Bit 4 into1
+000A F4                7     CPL A ; use NOT Gate
+                       8     END
+A51 MACRO ASSEMBLER  BASIC3                                                               10/19/2024 22:44:17 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+B. . . . . . . . .  D ADDR   00F0H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

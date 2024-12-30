@@ -1,0 +1,71 @@
+C51 COMPILER V9.60.7.0   BASIC                                                             12/13/2024 21:43:13 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE BASIC
+OBJECT MODULE PLACED IN .\Objects\Basic.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Basic.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\Bas
+                    -ic.lst) TABS(2) OBJECT(.\Objects\Basic.obj)
+
+line level    source
+
+   1          #include<reg51.h>          // Include the header file for 8051 microcontroller, defines hardware registers
+             - like P0, P1, etc.
+   2          void delay (int);
+   3          void turn ();
+   4          
+   5          code char one_phase[] = {0x01, 0x02, 0x04, 0x08};
+   6          code char two_phase[] = {0x0C, 0x06, 0x03, 0x09};
+   7          int dir, delay_time;
+   8          
+   9          void main() 
+  10          {
+  11   1          delay_time = 1000;
+  12   1          dir = 1;
+  13   1          while(1) 
+  14   1          {
+  15   2              turn();
+  16   2          }
+  17   1      }
+  18          
+  19          void turn() 
+  20          {
+  21   1          int x;                // Declare loop index variable
+  22   1          if (dir == 1) 
+  23   1          {
+  24   2              for (x = 0; x < 4; x++) 
+  25   2              {
+  26   3                  P1 = one_phase[x];             // Send control signal to P1 pins to control the motor
+  27   3                  delay(delay_time);             // Delay to stabilize the signal
+  28   3              }
+  29   2          } 
+  30   1          else 
+  31   1          {
+  32   2              for (x = 0; x < 4; x++) 
+  33   2              {
+  34   3                  P1 = two_phase[x];             // Send control signal to P1 pins to control the motor
+  35   3                  delay(delay_time);             // Delay to stabilize the signal
+  36   3              }
+  37   2          }
+  38   1      }
+  39          
+  40          // Delay function
+  41          void delay(int t) 
+  42          {
+  43   1          while(t--);           // Simple decrementing loop for delay until t reaches 0
+  44   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    119    ----
+   CONSTANT SIZE    =      8    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4       2
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   BASIC                                                             12/13/2024 21:43:13 PAGE 2   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

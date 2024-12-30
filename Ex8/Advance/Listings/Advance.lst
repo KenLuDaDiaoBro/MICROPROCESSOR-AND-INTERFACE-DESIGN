@@ -1,0 +1,94 @@
+C51 COMPILER V9.60.7.0   ADVANCE                                                           11/26/2024 16:49:35 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE ADVANCE
+OBJECT MODULE PLACED IN .\Objects\Advance.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Advance.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\A
+                    -dvance.lst) TABS(2) OBJECT(.\Objects\Advance.obj)
+
+line level    source
+
+   1          #include <regx51.h>
+   2          
+   3          char receive_value;            // Variable to store received data
+   4          char *Correct = "\r\ncorrect\r\n";
+   5          char *Wrong = "\r\nwrong\r\n";
+   6          char *School_Num = "E94116067";
+   7          char ans[9];
+   8          int Index = 0;
+   9          
+  10          // UART initialization function
+  11          void init_uart(void)
+  12          {
+  13   1          SCON = 0x50;               // Set UART mode 1 (8-bit UART)
+  14   1          TMOD = 0x20;               // Set Timer 1 to mode 2 (8-bit auto-reload)
+  15   1          TH1 = 0xE6;                // Set baud rate to 1200
+  16   1          TR1 = 1;                   // Start Timer 1
+  17   1      }
+  18          
+  19          void send_message(char *alphabt)
+  20          {
+  21   1          while(*alphabt != '\0')
+  22   1          {
+  23   2              SBUF = *alphabt;
+  24   2              while(TI == 0);
+  25   2              TI = 0;
+  26   2              alphabt++;
+  27   2          }
+  28   1      }
+  29          
+  30          int check()
+  31          {
+  32   1          int i = 0;
+  33   1          int pass = 1;
+  34   1          for(i = 0 ; i < 9 ; i++)
+  35   1          {
+  36   2              if(ans[i] != *(School_Num + i)) pass = 0;
+  37   2              ans[i] = '\0';
+  38   2          }
+  39   1          if(pass) return 1;
+  40   1          else return 0;
+  41   1      }
+  42          
+  43          void main()
+  44          {
+  45   1          init_uart();               // Initialize UART
+  46   1          while (1)
+  47   1          {
+  48   2              if (RI)                // Check the receive interrupt flag (polling method)
+  49   2              {
+  50   3                  RI = 0;            // Clear the receive interrupt flag
+  51   3                  receive_value = SBUF; // Read the received data from the serial buffer
+  52   3                  P2 = receive_value;   // Display the received data on Port 2
+  53   3                  if(P2 == 127 && Index > 0) Index--;
+  54   3                  else if((P2 == 13) || (48 <= P2 && P2 <= 57) || (65 <= P2 && P2 <= 90) || (97 <= P2 && P2 <= 122))
+C51 COMPILER V9.60.7.0   ADVANCE                                                           11/26/2024 16:49:35 PAGE 2   
+
+  55   3                  {
+  56   4                      ans[Index] = P2;
+  57   4                      Index++;
+  58   4                      if((Index >= 9) || (P2 == 13))
+  59   4                      {
+  60   5                          int result = check();
+  61   5                          Index = 0;
+  62   5                          if(result) send_message(Correct);
+  63   5                          else send_message(Wrong);
+  64   5                      }
+  65   4                  }
+  66   3              }
+  67   2          }
+  68   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    262    ----
+   CONSTANT SIZE    =     32    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     21       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,78 @@
+A51 MACRO ASSEMBLER  ADVANCE                                                              10/29/2024 19:50:21 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Advance.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Advance.A51 SET(SMALL) DEBUG PRINT(.\Listings\Advance.lst) OBJECT(.\Obj
+                      ects\Advance.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1                     ORG 0000h
+0000 7B00              2                     MOV R3, #0
+0002 802C              3                     JMP SETT ;jump into loop
+0030                   4                     ORG 0030h
+0030 758132            5     SETT:   MOV SP, #32h ;SP = #32H
+0033 743F              6                     MOV A, #00111111B
+0035 7908              7                     MOV R1, #8D
+0037 D290              8     LOOP:   SETB P1.0
+0039 D294              9                     SETB P1.4
+003B F5A0             10                     MOV P2, A
+003D 1150             11                     CALL DELAY
+003F 30901B           12                     JNB P1.0, PSHH
+0042 309422           13                     JNB P1.4, POPP
+0045 03               14                     RR A
+0046 D9EF             15                     DJNZ R1, LOOP
+0048 80E6             16                     JMP SETT
+                      17     
+004A 1150             18     NTOH:   CALL DELAY
+004C 3090FB           19                     JNB P1.0, NTOH
+004F 22               20                     RET
+                      21                     
+0050 7804             22     DELAY:  MOV R0, #4 ; loop 4 times
+0052 79FA             23     LOOP1:  MOV R1, #250 ; loop 250 times
+0054 7AFA             24     LOOP2:  MOV R2, #250 ; loop 250 times
+0056 DAFE             25                     DJNZ R2, $ ; decrement R2 until 0
+0058 D9FA             26                     DJNZ R1, LOOP2 ; decrement R1 until 0
+005A D8F6             27                     DJNZ R0, LOOP1 ; decrement R0 until 0
+005C 22               28                     RET ; return from
+                      29                     
+005D 1150             30     PSHH:   CALL DELAY
+005F F8               31                     MOV R0, A
+0060 C000             32                     PUSH 00h
+0062 0B               33                     INC R3
+0063 114A             34                     CALL NTOH
+0065 80D0             35                     JMP LOOP
+0067 1150             36     POPP:   CALL DELAY
+0069 D000             37                     POP 00h
+006B E8               38                     MOV A, R0
+006C F5A0             39                     MOV P2, A
+006E DBF7             40                     DJNZ R3, POPP
+0070 114A             41                     CALL NTOH
+0072 80BC             42                     JMP SETT
+                      43                     END
+A51 MACRO ASSEMBLER  ADVANCE                                                              10/29/2024 19:50:21 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+DELAY. . . . . . .  C ADDR   0050H   A   
+LOOP . . . . . . .  C ADDR   0037H   A   
+LOOP1. . . . . . .  C ADDR   0052H   A   
+LOOP2. . . . . . .  C ADDR   0054H   A   
+NTOH . . . . . . .  C ADDR   004AH   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+POPP . . . . . . .  C ADDR   0067H   A   
+PSHH . . . . . . .  C ADDR   005DH   A   
+SETT . . . . . . .  C ADDR   0030H   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

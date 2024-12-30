@@ -1,0 +1,32 @@
+A51 MACRO ASSEMBLER  BASIC2                                                               10/19/2024 22:16:03 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\Basic2.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Basic2.A51 SET(SMALL) DEBUG PRINT(.\Listings\Basic2.lst) OBJECT(.\Objec
+                      ts\Basic2.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0; code start from 0000H
+0000 7464              2     MOV A, #64H; move 64H into ACC
+0002 75F00D            3     MOV B, #0DH; move 0DH into B
+0005 25F0              4     ADD A, B; A+B, then save into ACC
+0007 75F006            5     MOV B, #06H; move divisor 06H into B
+000A 84                6     DIV AB; A/B
+                       7     END
+A51 MACRO ASSEMBLER  BASIC2                                                               10/19/2024 22:16:03 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+B. . . . . . . . .  D ADDR   00F0H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
