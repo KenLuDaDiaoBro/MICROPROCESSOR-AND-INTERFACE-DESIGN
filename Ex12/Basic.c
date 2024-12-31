@@ -5,7 +5,7 @@ void main()
 {
 	while(1)
 	{
-		P1_0 = 0;
+		P1_0 = 1;
 		delay(50000);
 		P1_0 = 0;
 		delay(50000);

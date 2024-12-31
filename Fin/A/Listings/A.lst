@@ -1,0 +1,163 @@
+C51 COMPILER V9.60.7.0   A                                                                 12/31/2024 18:58:34 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE A
+OBJECT MODULE PLACED IN .\Objects\A.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE A.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\A.lst) 
+                    -TABS(2) OBJECT(.\Objects\A.obj)
+
+line level    source
+
+   1          #include <regx51.h>
+   2          void print_msg(char *);  // Function to print a string to the LCD
+   3          void write(char, int);   // Function to send commands or data to the LCD
+   4          void delay(unsigned int); // Function to introduce delay
+   5          
+   6          char receive_value;            // Variable to store received data
+   7          char *On = "\r\nLCD on\r\n";
+   8          char *Off = "\r\nLCD off\r\n";
+   9          char *Wrong = "\r\nwrong\r\n";
+  10          char *School_Num = "E94116067";
+  11          char *Shutdown = "Shutdown";
+  12          char ans[9];
+  13          int Index = 0;
+  14          int open = 0;
+  15          
+  16          // UART initialization function
+  17          void init_uart(void)
+  18          {
+  19   1          SCON = 0x50;               // Set UART mode 1 (8-bit UART)
+  20   1          TMOD = 0x20;               // Set Timer 1 to mode 2 (8-bit auto-reload)
+  21   1          TH1 = 0xE6;                // Set baud rate to 1200
+  22   1          TR1 = 1;                   // Start Timer 1
+  23   1      }
+  24          
+  25          void send_message(char *alphabt)
+  26          {
+  27   1          while(*alphabt != '\0')
+  28   1          {
+  29   2              SBUF = *alphabt;
+  30   2              while(TI == 0);
+  31   2              TI = 0;
+  32   2              alphabt++;
+  33   2          }
+  34   1      }
+  35          
+  36          int check1()
+  37          {
+  38   1          int i = 0;
+  39   1          int pass = 1;
+  40   1          for(i = 0 ; i < 9 ; i++)
+  41   1          {
+  42   2              if(ans[i] != *(School_Num + i)) pass = 0;
+  43   2              ans[i] = '\0';
+  44   2          }
+  45   1          if(pass) return 1;
+  46   1          else return 0;
+  47   1      }
+  48          
+  49          int check2()
+  50          {
+  51   1          int i = 0;
+  52   1          int pass = 1;
+  53   1          for(i = 0 ; i < 8 ; i++)
+  54   1          {
+C51 COMPILER V9.60.7.0   A                                                                 12/31/2024 18:58:34 PAGE 2   
+
+  55   2              if(ans[i] != *(Shutdown + i)) pass = 0;
+  56   2              ans[i] = '\0';
+  57   2          }
+  58   1          if(pass) return 1;
+  59   1          else return 0;
+  60   1      }
+  61          
+  62          
+  63          
+  64          void main()
+  65          {
+  66   1          init_uart();               // Initialize UART
+  67   1          while (1)
+  68   1          {
+  69   2              if (RI)                // Check the receive interrupt flag (polling method)
+  70   2              {
+  71   3                  RI = 0;            // Clear the receive interrupt flag
+  72   3                  receive_value = SBUF; // Read the received data from the serial buffer
+  73   3                  P2 = receive_value;   // Display the received data on Port 2
+  74   3                  if(P2 == 127 && Index > 0) Index--;
+  75   3                  else if((P2 == 13) || (48 <= P2 && P2 <= 57) || (65 <= P2 && P2 <= 90) || (97 <= P2 && P2 <= 122))
+  76   3                  {
+  77   4                      ans[Index] = P2;
+  78   4                      Index++;
+  79   4                      if(open)
+  80   4                      {
+  81   5                          if((Index >= 8) || (P2 == 13))
+  82   5                          {
+  83   6                              int result = check2();
+  84   6                              Index = 0;
+  85   6                              if(result)
+  86   6                              {
+  87   7                                  send_message(Off);
+  88   7                                  P1_0 = 1;
+  89   7                                  open = 0;
+  90   7                              }
+  91   6                              else send_message(Wrong);
+  92   6                          }
+  93   5                      }
+  94   4                      else
+  95   4                      {
+  96   5                          if((Index >= 9) || (P2 == 13))
+  97   5                          {
+  98   6                              int result = check1();
+  99   6                              Index = 0;
+ 100   6                              if(result)
+ 101   6                              {
+ 102   7                                  send_message(On);
+ 103   7                                  P1_0 = 0;
+ 104   7                                  open = 1;
+ 105   7                              }
+ 106   6                              else send_message(Wrong);
+ 107   6                          }
+ 108   5                      }
+ 109   4                  }
+ 110   3              }
+ 111   2          }
+ 112   1      }
+ 113          
+ 114          // Function to display a string on the LCD
+ 115          void print_msg(char *msg) 
+ 116          {
+C51 COMPILER V9.60.7.0   A                                                                 12/31/2024 18:58:34 PAGE 3   
+
+ 117   1          for (; *msg != '\0'; msg++) // Iterates through the character array
+ 118   1              write(*msg, 1);         // Sends characters to the LCD in "data mode" (RS=1)
+ 119   1      }
+ 120          
+ 121          // Function to send a command or data to the LCD
+ 122          void write(char cmd, int rs_value) 
+ 123          {
+ 124   1          P2 = cmd;        // Set command or data (cmd) on Port 1
+ 125   1          P1_6 = rs_value; // Set RS (Register Select): 0 for command, 1 for data
+ 126   1          P1_7 = 1;        // ENABLE high to latch data into the LCD
+ 127   1          delay(100);      // Delay to stabilize the ENABLE signal
+ 128   1          P1_7 = 0;        // ENABLE low to complete the operation
+ 129   1      }
+ 130          
+ 131          // Function to introduce delay
+ 132          void delay(unsigned int i) 
+ 133          {
+ 134   1          while (i--); // Simple delay loop; time depends on clock speed
+ 135   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    480    ----
+   CONSTANT SIZE    =     52    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     29       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

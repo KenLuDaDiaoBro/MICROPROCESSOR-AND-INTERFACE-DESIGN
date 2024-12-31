@@ -1,0 +1,114 @@
+C51 COMPILER V9.60.7.0   D                                                                 12/31/2024 18:42:06 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE D
+OBJECT MODULE PLACED IN .\Objects\D.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE D.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\D.lst) 
+                    -TABS(2) OBJECT(.\Objects\D.obj)
+
+line level    source
+
+   1          #include <regx51.h> // Include the 8051 microcontroller header file
+   2          
+   3          void print_msg(char *);  // Function to print a string to the LCD
+   4          void write(char, int);   // Function to send commands or data to the LCD
+   5          void delay(unsigned int); // Function to introduce delay
+   6          
+   7          char *Wprd = "infon          cinfon          ";
+   8          int Press_Times = 0;
+   9          int Flag = 0;
+  10          int Times;
+  11          int W = 15;
+  12          
+  13          void main() 
+  14          {
+  15   1          P1_0 = 0;
+  16   1          delay(1000000);
+  17   1          write(0x38, 0); // Set LCD to 8-bit mode, 2-line display, 5x7 dot format
+  18   1          write(0x0F, 0); // Turn on display, enable cursor, set cursor to blink
+  19   1          write(0x06, 0); // Increment cursor position after data write
+  20   1          write(0x01, 0); // Clear display and return the cursor to home position
+  21   1          write(0x80, 0); // Set DDRAM address to 0x00 (beginning of the first line)
+  22   1          IT1 = 0; //enable a low-level signal on externalinterrupt
+  23   1          EX1 = 1; //enable INT0
+  24   1          EA = 1; //enable interrupt
+  25   1          while (1)// Infinite loop to keep the program runningwhile(1)
+  26   1          {
+  27   2              if(Press_Times == 2 || Press_Times == 3)
+  28   2              {
+  29   3                  write(0x38, 0); // Set LCD to 8-bit mode, 2-line display, 5x7 dot format
+  30   3                  write(0x0F, 0); // Turn on display, enable cursor, set cursor to blink
+  31   3                  write(0x06, 0); // Increment cursor position after data write
+  32   3                  write(0x01, 0); // Clear display and return the cursor to home position
+  33   3                  write(0x80, 0); // Set DDRAM address to 0x00 (beginning of the first line
+  34   3                  print_msg(Wprd + W);
+  35   3                  write(0xC0 , 0);
+  36   3                  print_msg("                ");
+  37   3                  if(Press_Times == 2) delay(50000);
+  38   3                  else if(Press_Times == 3) delay(10000);
+  39   3                  if(W != 0) W--;
+  40   3                  else W = 15;
+  41   3              }
+  42   2          }
+  43   1      }
+  44          
+  45          void int_1(void)interrupt 2
+  46          {
+  47   1        if(Flag == 0)
+  48   1        {
+  49   2            Flag = 1;
+  50   2            Press_Times++;
+  51   2            switch(Press_Times)
+  52   2            {
+  53   3              case 1:
+  54   3                print_msg("cinfon");
+C51 COMPILER V9.60.7.0   D                                                                 12/31/2024 18:42:06 PAGE 2   
+
+  55   3                break;
+  56   3              case 4:
+  57   3                while(1) delay(10000);
+  58   3                break;
+  59   3              default:
+  60   3                break;
+  61   3            }
+  62   2        }
+  63   1        delay(100000);
+  64   1        Flag = 0;
+  65   1      }
+  66          
+  67          // Function to display a string on the LCD
+  68          void print_msg(char *msg) 
+  69          {
+  70   1          for (; *msg != '\0'; msg++) // Iterates through the character array
+  71   1              write(*msg, 1);         // Sends characters to the LCD in "data mode" (RS=1)
+  72   1      }
+  73          
+  74          // Function to send a command or data to the LCD
+  75          void write(char cmd, int rs_value) 
+  76          {
+  77   1          P2 = cmd;        // Set command or data (cmd) on Port 1
+  78   1          P1_6 = rs_value; // Set RS (Register Select): 0 for command, 1 for data
+  79   1          P1_7 = 1;        // ENABLE high to latch data into the LCD
+  80   1          delay(100);      // Delay to stabilize the ENABLE signal
+  81   1          P1_7 = 0;        // ENABLE low to complete the operation
+  82   1      }
+  83          
+  84          // Function to introduce delay
+  85          void delay(unsigned int i) 
+  86          {
+  87   1          while (i--); // Simple delay loop; time depends on clock speed
+  88   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    385    ----
+   CONSTANT SIZE    =     56    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
